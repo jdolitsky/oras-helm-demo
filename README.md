@@ -2,6 +2,8 @@
 
 Example of using [`oras`](https://github.com/deislabs/oras) as a Go library to push a Helm chart to a registry.
 
+The source code can be found in [`main.go`](./main.go).
+
 ## Setup
 
 First, clone this repo:
