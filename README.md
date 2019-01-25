@@ -1,6 +1,6 @@
-# ORAS Helm Demo
+# oras-helm-demo
 
-Example of using ORAS as a Go library to push a Helm chart to a registry.
+Example of using [`oras`](https://github.com/deislabs/oras) as a Go library to push a Helm chart to a registry.
 
 ## Setup
 
