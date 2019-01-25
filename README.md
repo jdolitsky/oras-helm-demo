@@ -1,6 +1,6 @@
-# oras-demo
+# ORAS Helm Demo
 
-Example of using ORAS as a Go library to push a Helm chart to a registry
+Example of using ORAS as a Go library to push a Helm chart to a registry.
 
 ## Setup
 
@@ -23,6 +23,8 @@ Finally, start a Distribution registry server at `localhost:5000` with the follo
 docker run -dp 5000:5000 --restart=always --name registry registry:2
 ```
 
+The will run in the background. Use `docker logs -f registry` to see the logs and `docker rm -f registry` to stop.
+
 ## Run
 
 Run `main.go` with some arguments:
@@ -40,15 +42,19 @@ This will push the chart as 2 separate layers with the following media types:
 1. `application/vnd.cncf.helm.chart.config.v1+json` (metadata)
 2. `application/vnd.cncf.helm.chart.content.v1+tar` (package content)
 
-By separating `Chart.yaml` from the rest of the Helm chart, we prevent storing the same content twice for different names.
+By separating `Chart.yaml` (a.k.a the metadata) from the rest of the Helm chart, we prevent storing the same content in the registry twice for different names.
 
 ## Manifest
 
 You can use `curl` and `jq` to inspect the manifest of a pushed Helm chart:
 
 ```
-$ curl -s -H 'Accept: application/vnd.oci.image.manifest.v1+json' \
+curl -s -H 'Accept: application/vnd.oci.image.manifest.v1+json' \
     http://localhost:5000/v2/mychart/manifests/latest | jq
+```
+
+Output:
+```
 {
   "schemaVersion": 2,
   "config": {
