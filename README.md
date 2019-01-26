@@ -17,8 +17,7 @@ The will run in the background. Use `docker logs -f registry` to see the logs an
 To run examples below, clone this repo and gather required dependencies (requires Go 1.11+):
 
 ```
-git clone https://github.com/jdolitsky/oras-helm-demo.git
-cd oras-helm-demo/
+git clone https://github.com/jdolitsky/oras-helm-demo.git && cd oras-helm-demo/
 GO111MODULE=on go mod vendor
 ```
 
