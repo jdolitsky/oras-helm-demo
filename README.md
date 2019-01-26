@@ -1,25 +1,10 @@
 # oras-helm-demo
 
-Example of using [`oras`](https://github.com/deislabs/oras) as a Go library to push a Helm chart to a registry.
-
-The source code can be found in [`main.go`](./main.go).
+Demo of using [`oras`](https://github.com/deislabs/oras) as a Go library to push/pull a Helm chart to/from a registry.
 
 ## Setup
 
-First, clone this repo:
-
-```
-git clone https://github.com/jdolitsky/oras-helm-demo.git
-cd oras-helm-demo/
-```
-
-Next, gather required dependencies (requires Go 1.11+):
-
-```
-go mod vendor
-```
-
-Finally, start a Distribution registry server at `localhost:5000` with the following command:
+Start a Distribution registry server at `localhost:5000` with the following command:
 
 ```
 docker run -dp 5000:5000 --restart=always --name registry registry:2
@@ -27,12 +12,24 @@ docker run -dp 5000:5000 --restart=always --name registry registry:2
 
 The will run in the background. Use `docker logs -f registry` to see the logs and `docker rm -f registry` to stop.
 
-## Run
+## Examples
 
-Run `main.go` with some arguments:
+To run examples below, clone this repo and gather required dependencies (requires Go 1.11+):
 
 ```
-go run main.go mychart/ localhost:5000/mychart:latest
+git clone https://github.com/jdolitsky/oras-helm-demo.git
+cd oras-helm-demo/
+go mod vendor
+```
+
+### Push Helm chart to registry
+
+Souce code for `push.go` can be found [here](./push.go).
+
+Run `push.go` with 2 arguments:
+
+```
+go run push.go mychart/ localhost:5000/mychart:latest
 ```
 
 The first arg, `mychart/`, refers to a Helm chart directory path.
@@ -46,9 +43,21 @@ This will push the chart as 2 separate layers with the following media types:
 
 By separating `Chart.yaml` (a.k.a the metadata) from the rest of the Helm chart, we prevent storing the same content in the registry twice for different names.
 
-## Manifest
+### Pull Helm chart from registry
 
-You can use `curl` and `jq` to inspect the manifest of a pushed Helm chart:
+Souce code for `pull.go` can be found [here](./pull.go).
+
+Run `pull.go` with a single argument:
+
+```
+go run main.go localhost:5000/mychart:latest
+```
+
+This will download and convert the stored Helm chart into a usable format, saving it to `./charts/<chartname>`.
+
+## The Manifest
+
+You can use `curl` and `jq` to inspect the manifest of a Helm chart stored in a registry:
 
 ```
 curl -s -H 'Accept: application/vnd.oci.image.manifest.v1+json' \
