@@ -79,6 +79,7 @@ func main() {
 	check(err)
 	metadata.Name = name
 	metadata.Version = version
+	fmt.Printf("name: %s\nversion: %s\nmetadata: %s\n", name, version, metaJsonRaw)
 
 	// Construct chart and attach metadata
 	_, contentRaw, ok := memoryStore.Get(contentLayer)
