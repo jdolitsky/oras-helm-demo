@@ -64,7 +64,7 @@ curl -s -H 'Accept: application/vnd.oci.image.manifest.v1+json' \
     http://localhost:5000/v2/mychart/manifests/latest | jq
 ```
 
-Output:
+Example output:
 ```
 {
   "schemaVersion": 2,
