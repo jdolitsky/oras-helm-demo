@@ -19,7 +19,7 @@ To run examples below, clone this repo and gather required dependencies (require
 ```
 git clone https://github.com/jdolitsky/oras-helm-demo.git
 cd oras-helm-demo/
-go mod vendor
+GO111MODULE=on go mod vendor
 ```
 
 ### Push Helm chart to registry
