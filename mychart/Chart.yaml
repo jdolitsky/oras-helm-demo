@@ -1,0 +1,15 @@
+apiVersion: v1
+description: This is my chart... that is all
+name: mychart
+version: 2.7.1
+appVersion: 1.1.0
+home: https://hub.helm.sh
+icon: https://hub.helm.sh/assets/images/placeholder.png
+keywords:
+- mychart
+- itismine
+maintainers:
+- name: my-org
+  email: my-org@fakesite.org
+- name: their-org
+  email: their-org@fakesite.org
