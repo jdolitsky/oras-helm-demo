@@ -50,7 +50,7 @@ Souce code for `pull.go` can be found [here](./pull.go).
 Run `pull.go` with a single argument:
 
 ```
-go run main.go localhost:5000/mychart:latest
+go run pull.go localhost:5000/mychart:latest
 ```
 
 This will download and convert the stored Helm chart into a usable format, saving it to `./charts/<chartname>`.
