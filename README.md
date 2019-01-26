@@ -76,15 +76,19 @@ Example manifest:
     {
       "mediaType": "application/vnd.cncf.helm.chart.meta.v1+json",
       "digest": "sha256:c356ec641a696eb5f3320bed9e8ceeb505fcc84b7ee072a85a8098fc362e13b7",
-      "size": 210
+      "size": 210,
+      "annotations": {
+        "org.opencontainers.image.title": "meta.json"
+      }
     },
     {
       "mediaType": "application/vnd.cncf.helm.chart.content.v1+tar",
-      "digest": "sha256:6c91ce013a5c0438a7f5047c2c38fc7e441cea7b2dc9b140f77dfedebe7f804a",
+      "digest": "sha256:e5e50410addbc4d1aa16100e42e4eb99f2bb4b04157de130a528e6e5d8c71774",
       "size": 431,
       "annotations": {
-        "name": "mychart",
-        "version": "2.7.1"
+        "chart.name": "mychart",
+        "chart.version": "2.7.1",
+        "org.opencontainers.image.title": "content.tgz"
       }
     }
   ]

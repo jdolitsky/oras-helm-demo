@@ -2,16 +2,18 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 
 	"github.com/containerd/containerd/remotes/docker"
 	"github.com/deislabs/oras/pkg/content"
 	"github.com/deislabs/oras/pkg/oras"
-	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/sirupsen/logrus"
-	"k8s.io/helm/pkg/chartutil"
+)
+
+const (
+	helmChartMetaMediaType    = "application/vnd.cncf.helm.chart.meta.v1+json"
+	helmChartContentMediaType = "application/vnd.cncf.helm.chart.content.v1+tar"
 )
 
 func check(e error) {
@@ -26,35 +28,18 @@ func main() {
 	resolver := docker.NewResolver(docker.ResolverOptions{})
 
 	// Read command line args
-	chartDir := os.Args[1]
-	remoteRef := os.Args[2]
-	fmt.Printf("Attempting to push %s to %s...\n", chartDir, remoteRef)
+	remoteRef := os.Args[1]
+	fmt.Printf("Attempting to pull %s into ./output...\n", remoteRef)
 
-	// Load chart directory
-	chart, err := chartutil.LoadDir(chartDir)
+	// Pull layers from remote, filtering on only media types we care about
+	allowedMediaTypes := []string{helmChartMetaMediaType, helmChartContentMediaType}
+	layers, err := oras.Pull(ctx, resolver, remoteRef, memoryStore, allowedMediaTypes...)
 	check(err)
-	fmt.Printf("name: %s\nversion: %s\n", chart.Metadata.Name, chart.Metadata.Version)
 
-	// Create meta layer
-	metaMediaType := "application/vnd.cncf.helm.chart.meta.v1+json"
-	metaJsonString, err := json.Marshal(chart.Metadata)
-	check(err)
-	fmt.Println(metaJsonString)
-	metaLayer := memoryStore.Add("", metaMediaType, []byte(metaJsonString))
-
-	// Create content layer
-	contentMediaType := "application/vnd.cncf.helm.chart.content.v1+tar"
-	contentRaw := []byte("hello")
-	contentLayer := memoryStore.Add("", contentMediaType, contentRaw)
-	contentLayer.Annotations = map[string]string{
-		"name":    chart.Metadata.Name,
-		"version": chart.Metadata.Version,
+	for _, layer := range layers {
+		//digest := layer.Digest.Hex()
+		fmt.Println(layer)
 	}
-
-	// Push to remote
-	layers := []ocispec.Descriptor{metaLayer, contentLayer}
-	err = oras.Push(ctx, resolver, remoteRef, memoryStore, layers)
-	check(err)
 
 	fmt.Println("Success!")
 }

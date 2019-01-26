@@ -53,7 +53,8 @@ func main() {
 	fmt.Printf("name: %s\nversion: %s\nmetadata: %s\n", name, version, metaJsonRaw)
 
 	// Create meta layer
-	metaLayer := memoryStore.Add("", helmChartMetaMediaType, metaJsonRaw)
+	metaFileName := "meta.json"
+	metaLayer := memoryStore.Add(metaFileName, helmChartMetaMediaType, metaJsonRaw)
 
 	// Create content layer, which is the chart minus the metadata (Chart.yaml)
 	chart.Metadata = &chartmeta.Metadata{Name: "-", Version: "-"}
@@ -68,13 +69,11 @@ func main() {
 	check(err)
 	contentRaw, err := ioutil.ReadFile(tmpFile)
 	check(err)
-	contentLayer := memoryStore.Add("", helmChartContentMediaType, contentRaw)
+	contentLayer := memoryStore.Add("content.tgz", helmChartContentMediaType, contentRaw)
 
 	// Add the chart name and version as annotations on the content layer
-	contentLayer.Annotations = map[string]string{
-		"name":    name,
-		"version": version,
-	}
+	contentLayer.Annotations["chart.name"] = name
+	contentLayer.Annotations["chart.version"] = version
 
 	// Push to remote
 	layers := []ocispec.Descriptor{metaLayer, contentLayer}
