@@ -63,7 +63,7 @@ curl -s -H 'Accept: application/vnd.oci.image.manifest.v1+json' \
     http://localhost:5000/v2/mychart/manifests/latest | jq
 ```
 
-Example output:
+Example manifest:
 ```
 {
   "schemaVersion": 2,
@@ -74,14 +74,19 @@ Example output:
   },
   "layers": [
     {
-      "mediaType": "application/vnd.cncf.helm.chart.content.v1.tar",
-      "digest": "sha256:929d030362719cad6877ca4e8e6d3a60345cdfa97ace3e119ca0f674c2750df4",
-      "size": 18344,
+      "mediaType": "application/vnd.cncf.helm.chart.meta.v1+json",
+      "digest": "sha256:c356ec641a696eb5f3320bed9e8ceeb505fcc84b7ee072a85a8098fc362e13b7",
+      "size": 210
+    },
+    {
+      "mediaType": "application/vnd.cncf.helm.chart.content.v1+tar",
+      "digest": "sha256:6c91ce013a5c0438a7f5047c2c38fc7e441cea7b2dc9b140f77dfedebe7f804a",
+      "size": 431,
       "annotations": {
-        "org.opencontainers.image.title": "929d030362719cad6877ca4e8e6d3a60345cdfa97ace3e119ca0f674c2750df4"
+        "name": "mychart",
+        "version": "2.7.1"
       }
     }
   ]
 }
-
 ```
