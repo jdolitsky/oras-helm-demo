@@ -8,8 +8,3 @@ icon: https://hub.helm.sh/assets/images/placeholder.png
 keywords:
 - mychart
 - itismine
-maintainers:
-- name: my-org
-  email: my-org@fakesite.org
-- name: their-org
-  email: their-org@fakesite.org

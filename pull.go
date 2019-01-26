@@ -2,12 +2,16 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/containerd/containerd/remotes/docker"
 	"github.com/deislabs/oras/pkg/content"
 	"github.com/deislabs/oras/pkg/oras"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"github.com/sirupsen/logrus"
+	"k8s.io/helm/pkg/chartutil"
 )
 
 func check(e error) {
@@ -17,29 +21,45 @@ func check(e error) {
 }
 
 func main() {
-	ref := "localhost:5000/oras:test"
-	fileName := "hello.txt"
-	fileContent := []byte("Hello World!\n")
-	customMediaType := "my.custom.media.type"
-
 	ctx := context.Background()
+	memoryStore := content.NewMemoryStore()
 	resolver := docker.NewResolver(docker.ResolverOptions{})
 
-	// Push file(s) w custom mediatype to registry
-	memoryStore := content.NewMemoryStore()
-	desc := memoryStore.Add(fileName, customMediaType, fileContent)
-	pushContents := []ocispec.Descriptor{desc}
-	fmt.Printf("Pushing %s to %s... ", fileName, ref)
-	err := oras.Push(ctx, resolver, ref, memoryStore, pushContents)
-	check(err)
-	fmt.Println("success!")
+	// Read command line args
+	chartDir := os.Args[1]
+	remoteRef := os.Args[2]
+	fmt.Printf("Attempting to push %s to %s...\n", chartDir, remoteRef)
 
-	// Pull file(s) from registry and save to disk
-	fmt.Printf("Pulling from %s and saving to %s... ", ref, fileName)
-	fileStore := content.NewFileStore("")
-	allowedMediaTypes := []string{customMediaType}
-	_, err = oras.Pull(ctx, resolver, ref, fileStore, allowedMediaTypes...)
+	// Load chart directory
+	chart, err := chartutil.LoadDir(chartDir)
 	check(err)
-	fmt.Println("success!")
-	fmt.Printf("Try running 'cat %s'\n", fileName)
+	fmt.Printf("name: %s\nversion: %s\n", chart.Metadata.Name, chart.Metadata.Version)
+
+	// Create meta layer
+	metaMediaType := "application/vnd.cncf.helm.chart.meta.v1+json"
+	metaJsonString, err := json.Marshal(chart.Metadata)
+	check(err)
+	fmt.Println(metaJsonString)
+	metaLayer := memoryStore.Add("", metaMediaType, []byte(metaJsonString))
+
+	// Create content layer
+	contentMediaType := "application/vnd.cncf.helm.chart.content.v1+tar"
+	contentRaw := []byte("hello")
+	contentLayer := memoryStore.Add("", contentMediaType, contentRaw)
+	contentLayer.Annotations = map[string]string{
+		"name":    chart.Metadata.Name,
+		"version": chart.Metadata.Version,
+	}
+
+	// Push to remote
+	layers := []ocispec.Descriptor{metaLayer, contentLayer}
+	err = oras.Push(ctx, resolver, remoteRef, memoryStore, layers)
+	check(err)
+
+	fmt.Println("Success!")
+}
+
+// TODO: remove once WARN lines removed from oras/containerd
+func init() {
+	logrus.SetLevel(logrus.ErrorLevel)
 }
