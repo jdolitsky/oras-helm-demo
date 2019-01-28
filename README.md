@@ -37,7 +37,7 @@ The second arg, `localhost:5000/mychart:latest` is a reference
 to a remote registry address.
 
 This will push the chart as 2 separate layers with the following media types:
-1. `application/vnd.cncf.helm.chart.config.v1+json` (metadata)
+1. `application/vnd.cncf.helm.chart.meta.v1+json` (metadata)
 2. `application/vnd.cncf.helm.chart.content.v1+tar` (package content)
 
 By separating `Chart.yaml` (a.k.a the metadata) from the rest of the Helm chart, we prevent storing the same content in the registry twice for different names.
